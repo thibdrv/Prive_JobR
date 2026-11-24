@@ -1,0 +1,16 @@
+# Personal data: each user gets their own when they run the app
+results/
+.cache/
+settings.json
+settings.broken.json
+*.saving
+~$*.xlsx
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Built by build_exe.py
+dist/
+build/

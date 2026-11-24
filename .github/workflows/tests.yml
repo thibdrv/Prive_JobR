@@ -1,0 +1,37 @@
+# Runs the automatic checks on GitHub: after each push (without internet sites, a few seconds),
+# and every Monday plus on demand (Actions tab -> Tests -> Run workflow) against the live job sites.
+# GitHub emails you when a run fails.
+name: Tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Checks (logic, Excel file, translations, the window on a virtual screen)
+        run: xvfb-run -a python -m unittest -v
+
+  job-sites:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Live job sites
+        env:
+          RETRIEVE_JOB_ONLINE: "1"
+        run: python -m unittest tests.test_sites_online -v
